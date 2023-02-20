@@ -1,10 +1,10 @@
-import * as core from '@actions/core'
-import * as github from '@actions/github'
-import {GitHub} from '@actions/github/lib/utils'
+import {setFailed, getInput, setOutput} from '@actions/core'
+import github, {context} from '@actions/github'
 
-function getOctokit(): InstanceType<typeof GitHub> {
+// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+function getOctokit() {
   // Get the GitHub token from the environment
-  const token = core.getInput('github-token', {required: true})
+  const token = getInput('github-token', {required: true})
   if (!token) {
     throw new Error('No token found, please set github-token input.')
   }
@@ -13,15 +13,15 @@ function getOctokit(): InstanceType<typeof GitHub> {
 
 async function run(): Promise<void> {
   try {
-    if (github.context.payload.pull_request) {
+    if (context.payload.pull_request) {
       await handlePullRequest()
-    } else if (github.context.payload.issue) {
+    } else if (context.payload.issue) {
       await handleIssue()
     } else {
-      core.setFailed('Could not get issue or pull request from context.')
+      setFailed('Could not get issue or pull request from context.')
     }
   } catch (e) {
-    core.setFailed(`action happen error: ${e}`)
+    setFailed(`action happen error: ${e}`)
   }
 }
 
@@ -45,12 +45,12 @@ async function setIssueLabel(
   const isExist = labels.some(item => item.name === label)
 
   if (isExist) {
-    core.setOutput('Label is exist', `Label ${label} is exist, skip`)
+    setOutput('Label is exist', `Label ${label} is exist, skip`)
     return
   }
 
-  const owner = github.context.repo.owner
-  const repo = github.context.repo.repo
+  const owner = context.repo.owner
+  const repo = context.repo.repo
 
   // check repo has the label
   const {data: repoLabels} = await kit.rest.issues.listLabelsForRepo()
@@ -77,19 +77,19 @@ async function setIssueLabel(
 
 async function handleIssue(): Promise<void> {
   // Get the issue number from the context
-  const issueNumber = github.context.payload.issue?.number
+  const issueNumber = context.payload.issue?.number
 
   // Get the issue title from the context
-  const issueTitle = github.context.payload.issue?.title
+  const issueTitle = context.payload.issue?.title
 
   if (!issueNumber || !issueTitle) {
-    core.setFailed('Could not get issue number or title from context')
+    setFailed('Could not get issue number or title from context')
     return
   }
 
   // Check issue title is string
   if (typeof issueTitle !== 'string') {
-    core.setOutput('Not found title', 'The issue title is not string, skip')
+    setOutput('Not found title', 'The issue title is not string, skip')
     return
   }
 
@@ -98,7 +98,7 @@ async function handleIssue(): Promise<void> {
   const match = issueTitle.match(regex)
 
   if (!match) {
-    core.setOutput('Not found title', 'Not fount issue title prefix, skip')
+    setOutput('Not found title', 'Not fount issue title prefix, skip')
     return
   }
 
@@ -113,19 +113,19 @@ async function handleIssue(): Promise<void> {
   } else if (labelPrefix.includes('question') || labelPrefix.includes('help')) {
     setIssueLabel(issueNumber, 'Type: Question')
   } else {
-    core.setOutput('Not fount title', 'Not fount issue title prefix, skip')
+    setOutput('Not fount title', 'Not fount issue title prefix, skip')
   }
 }
 
 async function handlePullRequest(): Promise<void> {
   // Get pull request number from the context
-  const pullRequestNumber = github.context.payload.pull_request?.number
+  const pullRequestNumber = context.payload.pull_request?.number
   if (!pullRequestNumber) {
     throw new Error('Could not get pull request number from context')
   }
 
   // Get pull request title from the context
-  const pullRequestTitle = github.context.payload.pull_request?.title
+  const pullRequestTitle = context.payload.pull_request?.title
   if (!pullRequestTitle) {
     throw new Error('Could not get pull request title from context')
   }
@@ -134,10 +134,7 @@ async function handlePullRequest(): Promise<void> {
   const match = pullRequestTitle.match(regex)
 
   if (!match) {
-    core.setOutput(
-      'Not found title',
-      'Not fount pull request title prefix, skip'
-    )
+    setOutput('Not found title', 'Not fount pull request title prefix, skip')
     return
   }
 
@@ -146,10 +143,7 @@ async function handlePullRequest(): Promise<void> {
   const labelPrefix = prefix.toLowerCase()
 
   if (typeof labelPrefix !== 'string') {
-    core.setOutput(
-      'Not found title',
-      'The pull request title is not string, skip'
-    )
+    setOutput('Not found title', 'The pull request title is not string, skip')
     return
   }
 
@@ -160,10 +154,7 @@ async function handlePullRequest(): Promise<void> {
   } else if (labelPrefix.includes('feature') || labelPrefix.includes('feat')) {
     setIssueLabel(pullRequestNumber, 'Type: Feature')
   } else {
-    core.setOutput(
-      'Not fount title',
-      'Not fount pull request title prefix, skip'
-    )
+    setOutput('Not fount title', 'Not fount pull request title prefix, skip')
   }
 }
 
