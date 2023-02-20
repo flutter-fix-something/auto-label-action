@@ -24,19 +24,68 @@ const github_1 = __importDefault(__nccwpck_require__(1240));
 function getOctokit() {
     // Get the GitHub token from the environment
     const token = core_1.default.getInput('github-token', { required: true });
+    if (!token) {
+        throw new Error('No token found, please set github-token input.');
+    }
     return github_1.default.getOctokit(token);
 }
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
-        if (github_1.default.context.payload.issue) {
-            yield handleIssue();
+        try {
+            if (github_1.default.context.payload.issue) {
+                yield handleIssue();
+            }
+            else if (github_1.default.context.payload.pull_request) {
+                yield handlePullRequest();
+            }
+            else {
+                core_1.default.setFailed('Could not get issue or pull request from context.');
+            }
         }
-        else if (github_1.default.context.payload.pull_request) {
-            yield handlePullRequest();
+        catch (e) {
+            core_1.default.setFailed(`action happen error: ${e}`);
         }
-        else {
-            core_1.default.setFailed('Could not get issue or pull request from context.');
+    });
+}
+function randomColor() {
+    let color = '#';
+    const letters = '0123456789ABCDEF';
+    for (let i = 0; i < 6; i++) {
+        color += letters[Math.floor(Math.random() * 16)];
+    }
+    return color;
+}
+function setIssueLabel(issueNumber, label) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const kit = getOctokit();
+        // check label is exist
+        const { data: labels } = yield kit.rest.issues.listLabelsOnIssue();
+        const isExist = labels.some(item => item.name === label);
+        if (isExist) {
+            core_1.default.setOutput('Label is exist', `Label ${label} is exist, skip`);
+            return;
         }
+        const owner = github_1.default.context.repo.owner;
+        const repo = github_1.default.context.repo.repo;
+        // check repo has the label
+        const { data: repoLabels } = yield kit.rest.issues.listLabelsForRepo();
+        const isRepoExist = repoLabels.some(item => item.name === label);
+        if (!isRepoExist) {
+            // create label for repo
+            yield kit.rest.issues.createLabel({
+                name: label,
+                color: randomColor(),
+                owner,
+                repo
+            });
+        }
+        // add label to issue
+        yield kit.rest.issues.addLabels({
+            issue_number: issueNumber,
+            labels: [label],
+            owner,
+            repo
+        });
     });
 }
 function handleIssue() {
@@ -50,17 +99,71 @@ function handleIssue() {
             core_1.default.setFailed('Could not get issue number or title from context');
             return;
         }
-        const kit = getOctokit();
-        kit.issues.createComment({
-            owner: github_1.default.context.repo.owner,
-            repo: github_1.default.context.repo.repo,
-            issue_number: issueNumber,
-            body: `Thanks for opening this issue, a maintainer will get back to you shortly!`
-        });
+        // Check issue title is string
+        if (typeof issueTitle !== 'string') {
+            core_1.default.setOutput('Not found title', 'The issue title is not string, skip');
+            return;
+        }
+        // handle issue title
+        const regex = /(\[.*\])\s(.*)/;
+        const match = issueTitle.match(regex);
+        if (!match) {
+            core_1.default.setOutput('Not found title', 'Not fount issue title prefix, skip');
+            return;
+        }
+        const prefix = match[1];
+        const labelPrefix = prefix.toLowerCase();
+        // Found ignore case prefix 'bug'
+        if (labelPrefix.includes('bug')) {
+            setIssueLabel(issueNumber, 'Type: Bug');
+        }
+        else if (labelPrefix.includes('feature') || labelPrefix.includes('feat')) {
+            setIssueLabel(issueNumber, 'Type: Feature');
+        }
+        else if (labelPrefix.includes('question') || labelPrefix.includes('help')) {
+            setIssueLabel(issueNumber, 'Type: Question');
+        }
+        else {
+            core_1.default.setOutput('Not fount title', 'Not fount issue title prefix, skip');
+        }
     });
 }
 function handlePullRequest() {
-    return __awaiter(this, void 0, void 0, function* () { });
+    var _a, _b;
+    return __awaiter(this, void 0, void 0, function* () {
+        // Get pull request number from the context
+        const pullRequestNumber = (_a = github_1.default.context.payload.pull_request) === null || _a === void 0 ? void 0 : _a.number;
+        if (!pullRequestNumber) {
+            throw new Error('Could not get pull request number from context');
+        }
+        // Get pull request title from the context
+        const pullRequestTitle = (_b = github_1.default.context.payload.pull_request) === null || _b === void 0 ? void 0 : _b.title;
+        if (!pullRequestTitle) {
+            throw new Error('Could not get pull request title from context');
+        }
+        const regex = /(\[.*\])\s(.*)/;
+        const match = pullRequestTitle.match(regex);
+        if (!match) {
+            core_1.default.setOutput('Not found title', 'Not fount pull request title prefix, skip');
+            return;
+        }
+        const prefix = match[1];
+        const labelPrefix = prefix.toLowerCase();
+        if (typeof labelPrefix !== 'string') {
+            core_1.default.setOutput('Not found title', 'The pull request title is not string, skip');
+            return;
+        }
+        // Found ignore case prefix 'bug'
+        if (labelPrefix.includes('bug')) {
+            setIssueLabel(pullRequestNumber, 'Type: Bug');
+        }
+        else if (labelPrefix.includes('feature') || labelPrefix.includes('feat')) {
+            setIssueLabel(pullRequestNumber, 'Type: Feature');
+        }
+        else {
+            core_1.default.setOutput('Not fount title', 'Not fount pull request title prefix, skip');
+        }
+    });
 }
 run();
 

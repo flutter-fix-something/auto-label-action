@@ -5,6 +5,9 @@ import {GitHub} from '@actions/github/lib/utils'
 function getOctokit(): InstanceType<typeof GitHub> {
   // Get the GitHub token from the environment
   const token = core.getInput('github-token', {required: true})
+  if (!token) {
+    throw new Error('No token found, please set github-token input.')
+  }
   return github.getOctokit(token)
 }
 
