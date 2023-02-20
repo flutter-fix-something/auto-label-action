@@ -1,5 +1,5 @@
-import core from '@actions/core'
-import github from '@actions/github'
+import * as core from '@actions/core'
+import * as github from '@actions/github'
 import {GitHub} from '@actions/github/lib/utils'
 
 function getOctokit(): InstanceType<typeof GitHub> {
@@ -13,10 +13,10 @@ function getOctokit(): InstanceType<typeof GitHub> {
 
 async function run(): Promise<void> {
   try {
-    if (github.context.payload.issue) {
-      await handleIssue()
-    } else if (github.context.payload.pull_request) {
+    if (github.context.payload.pull_request) {
       await handlePullRequest()
+    } else if (github.context.payload.issue) {
+      await handleIssue()
     } else {
       core.setFailed('Could not get issue or pull request from context.')
     }
