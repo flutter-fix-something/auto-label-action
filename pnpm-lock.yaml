@@ -5,7 +5,7 @@ specifiers:
   '@actions/github': ^5.1.1
   '@types/node': ^18.14.0
   '@typescript-eslint/parser': ^4.33.0
-  '@vercel/ncc': ^0.31.1
+  '@vercel/ncc': ^0.36.1
   eslint: ^8.34.0
   eslint-plugin-github: ^4.6.1
   eslint-plugin-jest: ^25.7.0
@@ -22,7 +22,7 @@ dependencies:
 devDependencies:
   '@types/node': registry.npmmirror.com/@types/node/18.14.0
   '@typescript-eslint/parser': registry.npmmirror.com/@typescript-eslint/parser/4.33.0_7kw3g6rralp5ps6mg3uyzz6azm
-  '@vercel/ncc': registry.npmmirror.com/@vercel/ncc/0.31.1
+  '@vercel/ncc': registry.npmmirror.com/@vercel/ncc/0.36.1
   eslint: registry.npmmirror.com/eslint/8.34.0
   eslint-plugin-github: registry.npmmirror.com/eslint-plugin-github/4.6.1_7kw3g6rralp5ps6mg3uyzz6azm
   eslint-plugin-jest: registry.npmmirror.com/eslint-plugin-jest/25.7.0_gq4pfhc3jf4wx5nunjnxdbauza
@@ -1343,10 +1343,10 @@ packages:
       eslint-visitor-keys: registry.npmmirror.com/eslint-visitor-keys/3.3.0
     dev: true
 
-  registry.npmmirror.com/@vercel/ncc/0.31.1:
-    resolution: {integrity: sha512-g0FAxwdViI6UzsiVz5HssIHqjcPa1EHL6h+2dcJD893SoCJaGdqqgUF09xnMW6goWnnhbLvgiKlgJWrJa+7qYA==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/@vercel/ncc/-/ncc-0.31.1.tgz}
+  registry.npmmirror.com/@vercel/ncc/0.36.1:
+    resolution: {integrity: sha512-S4cL7Taa9yb5qbv+6wLgiKVZ03Qfkc4jGRuiUQMQ8HGBD5pcNRnHeYM33zBvJE4/zJGjJJ8GScB+WmTsn9mORw==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/@vercel/ncc/-/ncc-0.36.1.tgz}
     name: '@vercel/ncc'
-    version: 0.31.1
+    version: 0.36.1
     hasBin: true
     dev: true
 
