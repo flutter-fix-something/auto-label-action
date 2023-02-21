@@ -41,6 +41,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core_1 = __nccwpck_require__(1680);
 const github_1 = __importStar(__nccwpck_require__(1240));
+function setOutput(title, message) {
+    (0, core_1.info)(`${title}: ${message}`);
+}
 function getOctokit() {
     // Get the GitHub token from the environment
     const token = (0, core_1.getInput)('github-token', { required: true });
@@ -52,7 +55,7 @@ function getOctokit() {
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         const token = (0, core_1.getInput)('github-token', { required: true });
-        (0, core_1.setOutput)('Get github token: ', token);
+        (0, core_1.info)(`Get github token: ${token}`);
         try {
             if (github_1.context.payload.pull_request) {
                 yield handlePullRequest();
@@ -84,7 +87,7 @@ function setIssueLabel(issueNumber, label) {
         const { data: labels } = yield kit.rest.issues.listLabelsOnIssue();
         const isExist = labels.some(item => item.name === label);
         if (isExist) {
-            (0, core_1.setOutput)('Label is exist', `Label ${label} is exist, skip`);
+            (0, core_1.info)(`Label is exist, Label ${label} is exist, skip`);
             return;
         }
         const owner = github_1.context.repo.owner;
@@ -123,14 +126,14 @@ function handleIssue() {
         }
         // Check issue title is string
         if (typeof issueTitle !== 'string') {
-            (0, core_1.setOutput)('Not found title', 'The issue title is not string, skip');
+            setOutput('Not found title', 'The issue title is not string, skip');
             return;
         }
         // handle issue title
         const regex = /(\[.*\])\s(.*)/;
         const match = issueTitle.match(regex);
         if (!match) {
-            (0, core_1.setOutput)('Not found title', 'Not fount issue title prefix, skip');
+            setOutput('Not found title', 'Not fount issue title prefix, skip');
             return;
         }
         const prefix = match[1];
@@ -146,7 +149,7 @@ function handleIssue() {
             setIssueLabel(issueNumber, 'Type: Question');
         }
         else {
-            (0, core_1.setOutput)('Not fount title', 'Not fount issue title prefix, skip');
+            setOutput('Not fount title', 'Not fount issue title prefix, skip');
         }
     });
 }
@@ -166,13 +169,13 @@ function handlePullRequest() {
         const regex = /(\[.*\])\s(.*)/;
         const match = pullRequestTitle.match(regex);
         if (!match) {
-            (0, core_1.setOutput)('Not found title', 'Not fount pull request title prefix, skip');
+            setOutput('Not found title', 'Not fount pull request title prefix, skip');
             return;
         }
         const prefix = match[1];
         const labelPrefix = prefix.toLowerCase();
         if (typeof labelPrefix !== 'string') {
-            (0, core_1.setOutput)('Not found title', 'The pull request title is not string, skip');
+            setOutput('Not found title', 'The pull request title is not string, skip');
             return;
         }
         // Found ignore case prefix 'bug'
@@ -183,7 +186,7 @@ function handlePullRequest() {
             setIssueLabel(pullRequestNumber, 'Type: Feature');
         }
         else {
-            (0, core_1.setOutput)('Not fount title', 'Not fount pull request title prefix, skip');
+            setOutput('Not fount title', 'Not fount pull request title prefix, skip');
         }
     });
 }

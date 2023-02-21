@@ -1,6 +1,10 @@
-import {setFailed, getInput, setOutput} from '@actions/core'
+import {setFailed, getInput, info} from '@actions/core'
 import github, {context} from '@actions/github'
 import {GitHub} from '@actions/github/lib/utils'
+
+function setOutput(title: string, message: string): void {
+  info(`${title}: ${message}`)
+}
 
 function getOctokit(): InstanceType<typeof GitHub> {
   // Get the GitHub token from the environment
@@ -13,7 +17,7 @@ function getOctokit(): InstanceType<typeof GitHub> {
 
 async function run(): Promise<void> {
   const token = getInput('github-token', {required: true})
-  setOutput('Get github token: ', token)
+  info(`Get github token: ${token}`)
   try {
     if (context.payload.pull_request) {
       await handlePullRequest()
@@ -47,7 +51,7 @@ async function setIssueLabel(
   const isExist = labels.some(item => item.name === label)
 
   if (isExist) {
-    setOutput('Label is exist', `Label ${label} is exist, skip`)
+    info(`Label is exist, Label ${label} is exist, skip`)
     return
   }
 
