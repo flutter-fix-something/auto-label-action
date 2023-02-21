@@ -6,6 +6,29 @@ require('./sourcemap-register.js');/******/ (() => { // webpackBootstrap
 
 "use strict";
 
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -15,15 +38,13 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const core_1 = __importDefault(__nccwpck_require__(1680));
-const github_1 = __importDefault(__nccwpck_require__(1240));
+const core_1 = __nccwpck_require__(1680);
+const github_1 = __importStar(__nccwpck_require__(1240));
+// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 function getOctokit() {
     // Get the GitHub token from the environment
-    const token = core_1.default.getInput('github-token', { required: true });
+    const token = (0, core_1.getInput)('github-token', { required: true });
     if (!token) {
         throw new Error('No token found, please set github-token input.');
     }
@@ -32,18 +53,18 @@ function getOctokit() {
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            if (github_1.default.context.payload.issue) {
-                yield handleIssue();
-            }
-            else if (github_1.default.context.payload.pull_request) {
+            if (github_1.context.payload.pull_request) {
                 yield handlePullRequest();
             }
+            else if (github_1.context.payload.issue) {
+                yield handleIssue();
+            }
             else {
-                core_1.default.setFailed('Could not get issue or pull request from context.');
+                (0, core_1.setFailed)('Could not get issue or pull request from context.');
             }
         }
         catch (e) {
-            core_1.default.setFailed(`action happen error: ${e}`);
+            (0, core_1.setFailed)(`action happen error: ${e}`);
         }
     });
 }
@@ -62,11 +83,11 @@ function setIssueLabel(issueNumber, label) {
         const { data: labels } = yield kit.rest.issues.listLabelsOnIssue();
         const isExist = labels.some(item => item.name === label);
         if (isExist) {
-            core_1.default.setOutput('Label is exist', `Label ${label} is exist, skip`);
+            (0, core_1.setOutput)('Label is exist', `Label ${label} is exist, skip`);
             return;
         }
-        const owner = github_1.default.context.repo.owner;
-        const repo = github_1.default.context.repo.repo;
+        const owner = github_1.context.repo.owner;
+        const repo = github_1.context.repo.repo;
         // check repo has the label
         const { data: repoLabels } = yield kit.rest.issues.listLabelsForRepo();
         const isRepoExist = repoLabels.some(item => item.name === label);
@@ -92,23 +113,23 @@ function handleIssue() {
     var _a, _b;
     return __awaiter(this, void 0, void 0, function* () {
         // Get the issue number from the context
-        const issueNumber = (_a = github_1.default.context.payload.issue) === null || _a === void 0 ? void 0 : _a.number;
+        const issueNumber = (_a = github_1.context.payload.issue) === null || _a === void 0 ? void 0 : _a.number;
         // Get the issue title from the context
-        const issueTitle = (_b = github_1.default.context.payload.issue) === null || _b === void 0 ? void 0 : _b.title;
+        const issueTitle = (_b = github_1.context.payload.issue) === null || _b === void 0 ? void 0 : _b.title;
         if (!issueNumber || !issueTitle) {
-            core_1.default.setFailed('Could not get issue number or title from context');
+            (0, core_1.setFailed)('Could not get issue number or title from context');
             return;
         }
         // Check issue title is string
         if (typeof issueTitle !== 'string') {
-            core_1.default.setOutput('Not found title', 'The issue title is not string, skip');
+            (0, core_1.setOutput)('Not found title', 'The issue title is not string, skip');
             return;
         }
         // handle issue title
         const regex = /(\[.*\])\s(.*)/;
         const match = issueTitle.match(regex);
         if (!match) {
-            core_1.default.setOutput('Not found title', 'Not fount issue title prefix, skip');
+            (0, core_1.setOutput)('Not found title', 'Not fount issue title prefix, skip');
             return;
         }
         const prefix = match[1];
@@ -124,7 +145,7 @@ function handleIssue() {
             setIssueLabel(issueNumber, 'Type: Question');
         }
         else {
-            core_1.default.setOutput('Not fount title', 'Not fount issue title prefix, skip');
+            (0, core_1.setOutput)('Not fount title', 'Not fount issue title prefix, skip');
         }
     });
 }
@@ -132,25 +153,25 @@ function handlePullRequest() {
     var _a, _b;
     return __awaiter(this, void 0, void 0, function* () {
         // Get pull request number from the context
-        const pullRequestNumber = (_a = github_1.default.context.payload.pull_request) === null || _a === void 0 ? void 0 : _a.number;
+        const pullRequestNumber = (_a = github_1.context.payload.pull_request) === null || _a === void 0 ? void 0 : _a.number;
         if (!pullRequestNumber) {
             throw new Error('Could not get pull request number from context');
         }
         // Get pull request title from the context
-        const pullRequestTitle = (_b = github_1.default.context.payload.pull_request) === null || _b === void 0 ? void 0 : _b.title;
+        const pullRequestTitle = (_b = github_1.context.payload.pull_request) === null || _b === void 0 ? void 0 : _b.title;
         if (!pullRequestTitle) {
             throw new Error('Could not get pull request title from context');
         }
         const regex = /(\[.*\])\s(.*)/;
         const match = pullRequestTitle.match(regex);
         if (!match) {
-            core_1.default.setOutput('Not found title', 'Not fount pull request title prefix, skip');
+            (0, core_1.setOutput)('Not found title', 'Not fount pull request title prefix, skip');
             return;
         }
         const prefix = match[1];
         const labelPrefix = prefix.toLowerCase();
         if (typeof labelPrefix !== 'string') {
-            core_1.default.setOutput('Not found title', 'The pull request title is not string, skip');
+            (0, core_1.setOutput)('Not found title', 'The pull request title is not string, skip');
             return;
         }
         // Found ignore case prefix 'bug'
@@ -161,7 +182,7 @@ function handlePullRequest() {
             setIssueLabel(pullRequestNumber, 'Type: Feature');
         }
         else {
-            core_1.default.setOutput('Not fount title', 'Not fount pull request title prefix, skip');
+            (0, core_1.setOutput)('Not fount title', 'Not fount pull request title prefix, skip');
         }
     });
 }
