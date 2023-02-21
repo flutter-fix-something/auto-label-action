@@ -12,6 +12,8 @@ function getOctokit(): InstanceType<typeof GitHub> {
 }
 
 async function run(): Promise<void> {
+  const token = getInput('github-token', {required: true})
+  setOutput('Get github token: ', token)
   try {
     if (context.payload.pull_request) {
       await handlePullRequest()

@@ -51,6 +51,8 @@ function getOctokit() {
 }
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
+        const token = (0, core_1.getInput)('github-token', { required: true });
+        (0, core_1.setOutput)('Get github token: ', token);
         try {
             if (github_1.context.payload.pull_request) {
                 yield handlePullRequest();
