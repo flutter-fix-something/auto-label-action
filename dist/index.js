@@ -126,25 +126,34 @@ function handleIssue() {
         const regex = /(\[.*\])\s(.*)/;
         const match = issueTitle.match(regex);
         if (!match) {
-            log('Not found title', 'Not fount issue title prefix, skip');
+            setIssueLabel(issueNumber, 'Type: Other');
             return;
         }
         const prefix = match[1];
         const labelPrefix = prefix.toLowerCase();
         // Found ignore case prefix 'bug'
-        if (labelPrefix.includes('bug')) {
+        if (checkType(labelPrefix, ['bug', 'fix', 'fixes', 'fixed'])) {
             setIssueLabel(issueNumber, 'Type: Bug');
         }
-        else if (labelPrefix.includes('feature') || labelPrefix.includes('feat')) {
+        else if (checkType(labelPrefix, ['feature', 'feat'])) {
             setIssueLabel(issueNumber, 'Type: Feature');
         }
-        else if (labelPrefix.includes('question') || labelPrefix.includes('help')) {
-            setIssueLabel(issueNumber, 'Type: Question');
+        else if (checkType(labelPrefix, ['question', 'help', 'support', 'how'])) {
+            setIssueLabel(issueNumber, 'Type: Help');
         }
         else {
-            log('Not fount title', 'Not fount issue title prefix, skip');
+            setIssueLabel(issueNumber, 'Type: Other');
         }
     });
+}
+function checkType(type, keywords) {
+    const lowerType = type.toLowerCase();
+    for (const keyword of keywords) {
+        if (lowerType.includes(keyword)) {
+            return true;
+        }
+    }
+    return false;
 }
 function handlePullRequest() {
     var _a, _b;
@@ -169,17 +178,22 @@ function handlePullRequest() {
         const labelPrefix = prefix.toLowerCase();
         if (typeof labelPrefix !== 'string') {
             log('Not found title', 'The pull request title is not string, skip');
+            setIssueLabel(pullRequestNumber, 'Type: Other');
             return;
         }
         // Found ignore case prefix 'bug'
-        if (labelPrefix.includes('bug')) {
+        if (checkType(labelPrefix, ['bug', 'fix', 'fixes', 'fixed'])) {
             setIssueLabel(pullRequestNumber, 'Type: Bug');
         }
-        else if (labelPrefix.includes('feature') || labelPrefix.includes('feat')) {
+        else if (checkType(labelPrefix, ['feature', 'feat'])) {
             setIssueLabel(pullRequestNumber, 'Type: Feature');
+        }
+        else if (checkType(labelPrefix, ['question', 'help', 'support', 'how'])) {
+            setIssueLabel(pullRequestNumber, 'Type: Help');
         }
         else {
             log('Not fount title', 'Not fount pull request title prefix, skip');
+            setIssueLabel(pullRequestNumber, 'Type: Other');
         }
     });
 }
