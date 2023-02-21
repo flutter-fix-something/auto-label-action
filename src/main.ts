@@ -2,7 +2,7 @@ import {setFailed, getInput, info} from '@actions/core'
 import {context} from '@actions/github'
 import {Octokit} from '@octokit/rest'
 
-function setOutput(title: string, message: string): void {
+function log(title: string, message: string): void {
   info(`${title}: ${message}`)
 }
 
@@ -29,6 +29,7 @@ async function run(): Promise<void> {
       setFailed('Could not get issue or pull request from context.')
     }
   } catch (e) {
+    log('Happen error', `${e}`)
     setFailed(`action happen error: ${e}`)
   }
 }
@@ -97,7 +98,7 @@ async function handleIssue(): Promise<void> {
 
   // Check issue title is string
   if (typeof issueTitle !== 'string') {
-    setOutput('Not found title', 'The issue title is not string, skip')
+    log('Not found title', 'The issue title is not string, skip')
     return
   }
 
@@ -106,7 +107,7 @@ async function handleIssue(): Promise<void> {
   const match = issueTitle.match(regex)
 
   if (!match) {
-    setOutput('Not found title', 'Not fount issue title prefix, skip')
+    log('Not found title', 'Not fount issue title prefix, skip')
     return
   }
 
@@ -121,7 +122,7 @@ async function handleIssue(): Promise<void> {
   } else if (labelPrefix.includes('question') || labelPrefix.includes('help')) {
     setIssueLabel(issueNumber, 'Type: Question')
   } else {
-    setOutput('Not fount title', 'Not fount issue title prefix, skip')
+    log('Not fount title', 'Not fount issue title prefix, skip')
   }
 }
 
@@ -142,7 +143,7 @@ async function handlePullRequest(): Promise<void> {
   const match = pullRequestTitle.match(regex)
 
   if (!match) {
-    setOutput('Not found title', 'Not fount pull request title prefix, skip')
+    log('Not found title', 'Not fount pull request title prefix, skip')
     return
   }
 
@@ -151,7 +152,7 @@ async function handlePullRequest(): Promise<void> {
   const labelPrefix = prefix.toLowerCase()
 
   if (typeof labelPrefix !== 'string') {
-    setOutput('Not found title', 'The pull request title is not string, skip')
+    log('Not found title', 'The pull request title is not string, skip')
     return
   }
 
@@ -162,7 +163,7 @@ async function handlePullRequest(): Promise<void> {
   } else if (labelPrefix.includes('feature') || labelPrefix.includes('feat')) {
     setIssueLabel(pullRequestNumber, 'Type: Feature')
   } else {
-    setOutput('Not fount title', 'Not fount pull request title prefix, skip')
+    log('Not fount title', 'Not fount pull request title prefix, skip')
   }
 }
 

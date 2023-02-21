@@ -19,7 +19,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core_1 = __nccwpck_require__(1680);
 const github_1 = __nccwpck_require__(1240);
 const rest_1 = __nccwpck_require__(3306);
-function setOutput(title, message) {
+function log(title, message) {
     (0, core_1.info)(`${title}: ${message}`);
 }
 function getOctokit() {
@@ -47,6 +47,7 @@ function run() {
             }
         }
         catch (e) {
+            log('Happen error', `${e}`);
             (0, core_1.setFailed)(`action happen error: ${e}`);
         }
     });
@@ -105,14 +106,14 @@ function handleIssue() {
         }
         // Check issue title is string
         if (typeof issueTitle !== 'string') {
-            setOutput('Not found title', 'The issue title is not string, skip');
+            log('Not found title', 'The issue title is not string, skip');
             return;
         }
         // handle issue title
         const regex = /(\[.*\])\s(.*)/;
         const match = issueTitle.match(regex);
         if (!match) {
-            setOutput('Not found title', 'Not fount issue title prefix, skip');
+            log('Not found title', 'Not fount issue title prefix, skip');
             return;
         }
         const prefix = match[1];
@@ -128,7 +129,7 @@ function handleIssue() {
             setIssueLabel(issueNumber, 'Type: Question');
         }
         else {
-            setOutput('Not fount title', 'Not fount issue title prefix, skip');
+            log('Not fount title', 'Not fount issue title prefix, skip');
         }
     });
 }
@@ -148,13 +149,13 @@ function handlePullRequest() {
         const regex = /(\[.*\])\s(.*)/;
         const match = pullRequestTitle.match(regex);
         if (!match) {
-            setOutput('Not found title', 'Not fount pull request title prefix, skip');
+            log('Not found title', 'Not fount pull request title prefix, skip');
             return;
         }
         const prefix = match[1];
         const labelPrefix = prefix.toLowerCase();
         if (typeof labelPrefix !== 'string') {
-            setOutput('Not found title', 'The pull request title is not string, skip');
+            log('Not found title', 'The pull request title is not string, skip');
             return;
         }
         // Found ignore case prefix 'bug'
@@ -165,7 +166,7 @@ function handlePullRequest() {
             setIssueLabel(pullRequestNumber, 'Type: Feature');
         }
         else {
-            setOutput('Not fount title', 'Not fount pull request title prefix, skip');
+            log('Not fount title', 'Not fount pull request title prefix, skip');
         }
     });
 }
