@@ -52,14 +52,6 @@ function run() {
         }
     });
 }
-function randomColor() {
-    let color = '#';
-    const letters = '0123456789ABCDEF';
-    for (let i = 0; i < 6; i++) {
-        color += letters[Math.floor(Math.random() * 16)];
-    }
-    return color;
-}
 function setIssueLabel(issueNumber, label) {
     return __awaiter(this, void 0, void 0, function* () {
         const kit = getOctokit();
@@ -86,12 +78,10 @@ function setIssueLabel(issueNumber, label) {
         log('current repo labels', `${repoLabels}`);
         const isRepoExist = repoLabels.some(item => item.name === label);
         if (!isRepoExist) {
-            const color = randomColor();
-            log('Create label', `Not found [${label}], create it with color ( ${color} ) in repo`);
+            log('Create label', `Not found [${label}], create it in repo`);
             // create label for repo
             yield kit.rest.issues.createLabel({
                 name: label,
-                color: randomColor(),
                 owner,
                 repo
             });

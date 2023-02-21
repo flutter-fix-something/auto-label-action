@@ -34,15 +34,6 @@ async function run(): Promise<void> {
   }
 }
 
-function randomColor(): string {
-  let color = '#'
-  const letters = '0123456789ABCDEF'
-  for (let i = 0; i < 6; i++) {
-    color += letters[Math.floor(Math.random() * 16)]
-  }
-  return color
-}
-
 async function setIssueLabel(
   issueNumber: number,
   label: string
@@ -80,16 +71,11 @@ async function setIssueLabel(
   const isRepoExist = repoLabels.some(item => item.name === label)
 
   if (!isRepoExist) {
-    const color = randomColor()
-    log(
-      'Create label',
-      `Not found [${label}], create it with color ( ${color} ) in repo`
-    )
+    log('Create label', `Not found [${label}], create it in repo`)
 
     // create label for repo
     await kit.rest.issues.createLabel({
       name: label,
-      color: randomColor(),
       owner,
       repo
     })
