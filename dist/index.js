@@ -63,17 +63,25 @@ function randomColor() {
 function setIssueLabel(issueNumber, label) {
     return __awaiter(this, void 0, void 0, function* () {
         const kit = getOctokit();
+        const owner = github_1.context.repo.owner;
+        const repo = github_1.context.repo.repo;
         // check label is exist
-        const { data: labels } = yield kit.rest.issues.listLabelsOnIssue();
+        const { data: labels } = yield kit.rest.issues.listLabelsOnIssue({
+            issue_number: issueNumber,
+            owner,
+            repo
+        });
         const isExist = labels.some(item => item.name === label);
         if (isExist) {
             (0, core_1.info)(`Label is exist, Label ${label} is exist, skip`);
             return;
         }
-        const owner = github_1.context.repo.owner;
-        const repo = github_1.context.repo.repo;
         // check repo has the label
-        const { data: repoLabels } = yield kit.rest.issues.listLabelsForRepo();
+        const { data: repoLabels } = yield kit.rest.issues.listLabelsForRepo({
+            per_page: 100,
+            owner,
+            repo
+        });
         const isRepoExist = repoLabels.some(item => item.name === label);
         if (!isRepoExist) {
             // create label for repo
