@@ -8,7 +8,7 @@ function log(title: string, message: string): void {
 
 function getOctokit(): Octokit {
   // Get the GitHub token from the environment
-  const token = getInput('github-token', {required: true})
+  const token = getInput('github-token')
   if (!token) {
     throw new Error('No token found, please set github-token input.')
   }

@@ -24,7 +24,7 @@ function log(title, message) {
 }
 function getOctokit() {
     // Get the GitHub token from the environment
-    const token = (0, core_1.getInput)('github-token', { required: true });
+    const token = (0, core_1.getInput)('github-token');
     if (!token) {
         throw new Error('No token found, please set github-token input.');
     }
