@@ -1,8 +1,8 @@
 import {setFailed, getInput, setOutput} from '@actions/core'
 import github, {context} from '@actions/github'
+import {GitHub} from '@actions/github/lib/utils'
 
-// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
-function getOctokit() {
+function getOctokit(): InstanceType<typeof GitHub> {
   // Get the GitHub token from the environment
   const token = getInput('github-token', {required: true})
   if (!token) {

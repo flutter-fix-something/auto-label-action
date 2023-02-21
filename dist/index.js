@@ -41,7 +41,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core_1 = __nccwpck_require__(1680);
 const github_1 = __importStar(__nccwpck_require__(1240));
-// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 function getOctokit() {
     // Get the GitHub token from the environment
     const token = (0, core_1.getInput)('github-token', { required: true });
