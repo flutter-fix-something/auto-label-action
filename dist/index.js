@@ -76,14 +76,17 @@ function setIssueLabel(issueNumber, label) {
             (0, core_1.info)(`Label is exist, Label ${label} is exist, skip`);
             return;
         }
+        log('current issue labels', `${labels}`);
         // check repo has the label
         const { data: repoLabels } = yield kit.rest.issues.listLabelsForRepo({
             per_page: 100,
             owner,
             repo
         });
+        log('current repo labels', `${repoLabels}`);
         const isRepoExist = repoLabels.some(item => item.name === label);
         if (!isRepoExist) {
+            log('Not found label', `Not found label ${label} in repo, create it`);
             // create label for repo
             yield kit.rest.issues.createLabel({
                 name: label,
@@ -92,6 +95,7 @@ function setIssueLabel(issueNumber, label) {
                 repo
             });
         }
+        log('Add label', `Add label ${label} to issue`);
         // add label to issue
         yield kit.rest.issues.addLabels({
             issue_number: issueNumber,
@@ -99,6 +103,7 @@ function setIssueLabel(issueNumber, label) {
             owner,
             repo
         });
+        log('Add label', `Add label ${label} to issue success`);
     });
 }
 function handleIssue() {

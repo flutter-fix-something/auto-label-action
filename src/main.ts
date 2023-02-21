@@ -2,7 +2,7 @@ import {setFailed, getInput, info} from '@actions/core'
 import {context} from '@actions/github'
 import {Octokit} from '@octokit/rest'
 
-function log(title: string, message: string): void {
+function log(title: string, message: unknown): void {
   info(`${title}: ${message}`)
 }
 
@@ -65,15 +65,23 @@ async function setIssueLabel(
     info(`Label is exist, Label ${label} is exist, skip`)
     return
   }
+
+  log('current issue labels', `${labels}`)
+
   // check repo has the label
   const {data: repoLabels} = await kit.rest.issues.listLabelsForRepo({
     per_page: 100,
     owner,
     repo
   })
+
+  log('current repo labels', `${repoLabels}`)
+
   const isRepoExist = repoLabels.some(item => item.name === label)
 
   if (!isRepoExist) {
+    log('Not found label', `Not found label ${label} in repo, create it`)
+
     // create label for repo
     await kit.rest.issues.createLabel({
       name: label,
@@ -83,6 +91,7 @@ async function setIssueLabel(
     })
   }
 
+  log('Add label', `Add label ${label} to issue`)
   // add label to issue
   await kit.rest.issues.addLabels({
     issue_number: issueNumber,
@@ -90,6 +99,8 @@ async function setIssueLabel(
     owner,
     repo
   })
+
+  log('Add label', `Add label ${label} to issue success`)
 }
 
 async function handleIssue(): Promise<void> {
