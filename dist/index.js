@@ -86,7 +86,8 @@ function setIssueLabel(issueNumber, label) {
         log('current repo labels', `${repoLabels}`);
         const isRepoExist = repoLabels.some(item => item.name === label);
         if (!isRepoExist) {
-            log('Not found label', `Not found label ${label} in repo, create it`);
+            const color = randomColor();
+            log('Create label', `Not found [${label}], create it with color ( ${color} ) in repo`);
             // create label for repo
             yield kit.rest.issues.createLabel({
                 name: label,
