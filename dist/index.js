@@ -31,6 +31,14 @@ function getOctokit() {
     const octokit = new rest_1.Octokit({ auth: `token ${token}` });
     return octokit;
 }
+function randomColor() {
+    const colorHex = '0123456789ABCDEF';
+    let color = '';
+    for (let i = 0; i < 6; i++) {
+        color += colorHex[Math.floor(Math.random() * 16)];
+    }
+    return color;
+}
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         const token = (0, core_1.getInput)('github-token', { required: true });
@@ -83,7 +91,8 @@ function setIssueLabel(issueNumber, label) {
             yield kit.rest.issues.createLabel({
                 name: label,
                 owner,
-                repo
+                repo,
+                color: randomColor()
             });
         }
         log('Add label', `Add label ${label} to issue`);
