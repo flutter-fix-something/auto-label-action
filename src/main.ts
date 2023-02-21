@@ -17,6 +17,15 @@ function getOctokit(): Octokit {
   return octokit
 }
 
+function randomColor(): string {
+  const colorHex = '0123456789ABCDEF'
+  let color = ''
+  for (let i = 0; i < 6; i++) {
+    color += colorHex[Math.floor(Math.random() * 16)]
+  }
+  return color
+}
+
 async function run(): Promise<void> {
   const token = getInput('github-token', {required: true})
   info(`Get github token: ${token}`)
@@ -77,7 +86,8 @@ async function setIssueLabel(
     await kit.rest.issues.createLabel({
       name: label,
       owner,
-      repo
+      repo,
+      color: randomColor()
     })
   }
 
