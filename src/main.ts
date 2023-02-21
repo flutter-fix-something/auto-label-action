@@ -1,18 +1,20 @@
 import {setFailed, getInput, info} from '@actions/core'
-import github, {context} from '@actions/github'
-import {GitHub} from '@actions/github/lib/utils'
+import {context} from '@actions/github'
+import {Octokit} from '@octokit/rest'
 
 function setOutput(title: string, message: string): void {
   info(`${title}: ${message}`)
 }
 
-function getOctokit(): InstanceType<typeof GitHub> {
+function getOctokit(): Octokit {
   // Get the GitHub token from the environment
   const token = getInput('github-token', {required: true})
   if (!token) {
     throw new Error('No token found, please set github-token input.')
   }
-  return github.getOctokit(token)
+  const octokit = new Octokit({auth: `token ${token}`})
+
+  return octokit
 }
 
 async function run(): Promise<void> {
