@@ -68,7 +68,6 @@ async function setIssueLabel(
   // check repo has the label
   const {data: repoLabels} = await kit.rest.issues.listLabelsForRepo({
     per_page: 100,
-    page: 1,
     owner,
     repo
   })
